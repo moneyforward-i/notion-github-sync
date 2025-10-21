@@ -1,0 +1,18 @@
+# Basic usage example - Add this to .github/workflows/notion-sync.yml
+
+name: Sync PR with Notion
+
+on:
+  pull_request:
+    types: [opened, closed, reopened, ready_for_review, converted_to_draft]
+
+jobs:
+  sync-notion:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync PR with Notion
+        uses: your-username/notion-github-sync@v1
+        with:
+          notion-token: ${{ secrets.NOTION_TOKEN }}
+          notion-database-id: ${{ secrets.NOTION_DATABASE_ID }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}

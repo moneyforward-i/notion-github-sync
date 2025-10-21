@@ -1,0 +1,38 @@
+# Advanced usage with custom properties and conditions
+
+name: Advanced Notion PR Sync
+
+on:
+  pull_request:
+    types: [opened, closed, reopened, ready_for_review, converted_to_draft, synchronize]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  sync-notion:
+    runs-on: ubuntu-latest
+    # Only sync for non-draft PRs in main repository
+    if: |
+      github.event.pull_request.draft == false && 
+      github.repository == 'your-org/your-repo'
+    
+    steps:
+      - name: Sync PR with Custom Notion Properties
+        uses: your-username/notion-github-sync@v1
+        with:
+          notion-token: ${{ secrets.NOTION_TOKEN }}
+          notion-database-id: ${{ secrets.NOTION_DATABASE_ID }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          # Custom property names
+          pr-title-property: 'Pull Request Title'
+          pr-status-property: 'PR Status'
+          pr-author-property: 'Developer'
+          pr-repository-property: 'Repo'
+          pr-branch-property: 'Feature Branch'
+          pr-url-property: 'GitHub Link'
+          pr-number-property: 'PR #'
+
+      - name: Notify team on sync
+        if: steps.notion-sync.outputs.sync-status == 'created'
+        run: |
+          echo "New PR synced to Notion: ${{ steps.notion-sync.outputs.notion-page-id }}"

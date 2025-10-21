@@ -1,0 +1,41 @@
+# Organization-wide deployment with multiple repositories
+
+name: Organization PR Sync
+
+on:
+  pull_request:
+    types: [opened, closed, reopened, ready_for_review, converted_to_draft]
+
+jobs:
+  sync-notion:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Determine Notion Database
+        id: database
+        run: |
+          case "${{ github.repository }}" in
+            "org/backend-*")
+              echo "database-id=${{ secrets.NOTION_BACKEND_DB_ID }}" >> $GITHUB_OUTPUT
+              ;;
+            "org/frontend-*")
+              echo "database-id=${{ secrets.NOTION_FRONTEND_DB_ID }}" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo "database-id=${{ secrets.NOTION_GENERAL_DB_ID }}" >> $GITHUB_OUTPUT
+              ;;
+          esac
+
+      - name: Sync PR with Notion
+        uses: your-username/notion-github-sync@v1
+        with:
+          notion-token: ${{ secrets.NOTION_TOKEN }}
+          notion-database-id: ${{ steps.database.outputs.database-id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add team-specific labels
+        if: contains(github.repository, 'backend-')
+        run: |
+          gh pr edit ${{ github.event.number }} --add-label "backend-team"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

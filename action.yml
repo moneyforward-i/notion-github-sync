@@ -1,0 +1,56 @@
+name: 'Notion GitHub Sync'
+description: 'Synchronize GitHub Pull Request status with Notion database'
+author: 'Your Organization'
+branding:
+  icon: 'git-pull-request'
+  color: 'blue'
+
+inputs:
+  notion-token:
+    description: 'Notion Integration Token'
+    required: true
+  notion-database-id:
+    description: 'Notion Database ID to sync with'
+    required: true
+  github-token:
+    description: 'GitHub Token for API access'
+    required: false
+    default: ${{ github.token }}
+  pr-title-property:
+    description: 'Notion property name for PR title'
+    required: false
+    default: 'Title'
+  pr-url-property:
+    description: 'Notion property name for GitHub URL'
+    required: false
+    default: 'GitHub URL'
+  pr-status-property:
+    description: 'Notion property name for PR status'
+    required: false
+    default: 'Status'
+  pr-number-property:
+    description: 'Notion property name for PR number'
+    required: false
+    default: 'PR Number'
+  pr-author-property:
+    description: 'Notion property name for PR author'
+    required: false
+    default: 'Author'
+  pr-repository-property:
+    description: 'Notion property name for repository'
+    required: false
+    default: 'Repository'
+  pr-branch-property:
+    description: 'Notion property name for branch'
+    required: false
+    default: 'Branch'
+
+outputs:
+  notion-page-id:
+    description: 'The ID of the created/updated Notion page'
+  sync-status:
+    description: 'The status of the synchronization (created, updated, or skipped)'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
